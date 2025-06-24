@@ -1,8 +1,8 @@
-import asyncio
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, jsonify
 from flask_cors import CORS
-from hypercorn.asyncio import serve
-from hypercorn.config import Config
+import os
+import asyncio
+import threading
 from bot import bot_main
 
 app = Flask(__name__)
@@ -10,19 +10,16 @@ CORS(app)
 
 @app.route("/scores.json")
 def get_scores():
-    from os.path import dirname, join
-    return send_from_directory(directory=dirname(__file__), path="scores.json", mimetype="application/json")
+    full_path = os.path.join(os.path.dirname(__file__), "scores.json")
+    return send_from_directory(directory=os.path.dirname(full_path), path="scores.json", mimetype="application/json")
 
-async def run_flask():
-    config = Config()
-    config.bind = ["0.0.0.0:8080"]
-    await serve(app, config)
-
-async def main():
-    await asyncio.gather(
-        run_flask(),
-        bot_main()
-    )
+def run_bot():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.create_task(bot_main())
+    loop.run_forever()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    threading.Thread(target=run_bot).start()
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
