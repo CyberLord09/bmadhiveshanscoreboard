@@ -5,7 +5,8 @@ import nest_asyncio
 import re
 
 # Path to your scores file
-SCORES_FILE = "scores.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SCORES_FILE = os.path.join(BASE_DIR, "scores.json")
 TEAMS = ["Team Shraddha", "Team Nishtha", "Team Bhakti", "Team Seva", "Team Agna", "Team Rajipo"]
 
 def load_scores():
