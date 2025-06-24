@@ -1,7 +1,10 @@
-from flask import Flask, send_from_directory, jsonify, render_template
+from flask import Flask, jsonify, render_template
+import json
 import os
 
 app = Flask(__name__)
+
+SCORES_FILE = os.path.join(os.path.dirname(__file__), "scores.json")
 
 @app.route("/")
 def index():
@@ -9,8 +12,12 @@ def index():
 
 @app.route("/scores.json")
 def get_scores():
-    full_path = os.path.join(os.path.dirname(__file__), "scores.json")
-    return send_from_directory(directory=os.path.dirname(full_path), path="scores.json", mimetype="application/json")
+    try:
+        with open(SCORES_FILE, "r") as f:
+            scores = json.load(f)
+        return jsonify(scores)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
