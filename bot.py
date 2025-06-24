@@ -77,7 +77,7 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Unknown command.")
 
 async def bot_main():
-    app = ApplicationBuilder().token("YOUR_BOT_TOKEN").build()
+    app = ApplicationBuilder().token("8073398946:AAHyl4Rg9As5hcn914zJhXsDtrxQZ4AHN2E").build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("score", score))
