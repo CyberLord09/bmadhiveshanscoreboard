@@ -1,9 +1,8 @@
-from flask import Flask, send_from_directory, render_template
+from flask import Flask, send_from_directory, jsonify, render_template
 from flask_cors import CORS
 import os
-import threading
 import asyncio
-from bot import main as bot_main
+from bot import bot_main
 
 app = Flask(__name__)
 CORS(app)
@@ -17,10 +16,27 @@ def get_scores():
     full_path = os.path.join(os.path.dirname(__file__), "scores.json")
     return send_from_directory(directory=os.path.dirname(full_path), path="scores.json", mimetype="application/json")
 
-def run_bot():
-    asyncio.run(bot_main())
+async def run_flask():
+    from werkzeug.serving import make_server
+
+    class ServerThread:
+        def __init__(self, app):
+            self.server = make_server("0.0.0.0", int(os.environ.get("PORT", 8080)), app)
+            self.ctx = app.app_context()
+            self.ctx.push()
+
+        def serve_forever(self):
+            self.server.serve_forever()
+
+    server = ServerThread(app)
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(None, server.serve_forever)
+
+async def main():
+    await asyncio.gather(
+        bot_main(),     # Run Telegram bot
+        run_flask(),    # Run Flask server
+    )
 
 if __name__ == "__main__":
-    threading.Thread(target=run_bot, daemon=True).start()
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port)
+    asyncio.run(main())
