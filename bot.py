@@ -1,11 +1,9 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
 import json
-import nest_asyncio
-import re
 import os
+import re
 
-# Path to your scores file
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SCORES_FILE = os.path.join(BASE_DIR, "scores.json")
 TEAMS = ["Team Shraddha", "Team Nishtha", "Team Bhakti", "Team Seva", "Team Agna", "Team Rajipo"]
@@ -32,7 +30,6 @@ async def score(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Select a team:", reply_markup=reply_markup)
     elif update.callback_query:
         await update.callback_query.edit_message_text("Select a team:", reply_markup=reply_markup)
-
 
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     scores = reset_scores()
@@ -64,7 +61,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=team_controls(data)
         )
     elif "+" in data or "-" in data:
-        match = re.match(r"(.+?)([+-]\d+)", data)
+        match = re.match(r"(.+?)([+-]\\d+)", data)
         if match:
             team, change = match.groups()
             change = int(change)
@@ -79,9 +76,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Unknown command.")
 
-# Run the bot
-async def main():
-    app = ApplicationBuilder().token("8073398946:AAHyl4Rg9As5hcn914zJhXsDtrxQZ4AHN2E").build()
+async def bot_main():
+    app = ApplicationBuilder().token("YOUR_BOT_TOKEN").build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("score", score))
@@ -90,8 +86,3 @@ async def main():
     app.add_handler(MessageHandler(filters.COMMAND, unknown))
 
     await app.run_polling()
-
-if __name__ == "__main__":
-    import asyncio
-    nest_asyncio.apply()
-    asyncio.get_event_loop().run_until_complete(main())
