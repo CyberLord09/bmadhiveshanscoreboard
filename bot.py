@@ -1,8 +1,8 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
 import json
-import os
 import re
+import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SCORES_FILE = os.path.join(BASE_DIR, "scores.json")
@@ -61,7 +61,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=team_controls(data)
         )
     elif "+" in data or "-" in data:
-        match = re.match(r"(.+?)([+-]\\d+)", data)
+        match = re.match(r"(.+?)([+-]\d+)", data)
         if match:
             team, change = match.groups()
             change = int(change)
@@ -77,7 +77,7 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Unknown command.")
 
 async def bot_main():
-    app = ApplicationBuilder().token("8073398946:AAHyl4Rg9As5hcn914zJhXsDtrxQZ4AHN2E").build()
+    app = ApplicationBuilder().token("YOUR_TELEGRAM_BOT_TOKEN").build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("score", score))
@@ -85,4 +85,6 @@ async def bot_main():
     app.add_handler(CallbackQueryHandler(button))
     app.add_handler(MessageHandler(filters.COMMAND, unknown))
 
-    await app.run_polling()
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
