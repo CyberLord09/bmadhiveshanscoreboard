@@ -3,6 +3,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 import json
 import nest_asyncio
 import re
+import os
 
 # Path to your scores file
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
